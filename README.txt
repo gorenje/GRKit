@@ -1,5 +1,5 @@
 Some utilities for Cappuccino
------------------------------
+=============================
 
 Still work in progress.
 
@@ -17,4 +17,36 @@ GRRotateView
 Provide the basics for creating a view that can rotate it self and still know whether
 a mouse event is destined for the view.
 
+GRInfoWindow
+------------
+
+Subclass of CPAlert that allows having no buttons. It was possible to have a CPAlert
+with no button in release 0.8.1 of Cappuccino, but with 0.9.x this was removed. So
+this class provides a no-button-alert window.
+
+Usage
+=====
+
+Similiar to other Frameworks, this should be included in the Frameworks directory 
+in your application:
+
+cd Frameworks && git clone git://github.com/gorenje/GRKit.git
+
+Or if you like, add an extra Libraries directory, build the library and link from
+Frameworks directory:
+
+### checkout and build library.
+cd Libraries 
+git clone git://github.com/gorenje/GRKit.git
+cd GRKit
+jake release && jake debug
+
+### link from frameworks
+cd ../../Frameworks
+ln -s ../Libraries/GRKit/Build/Release/GRKit
+cd Debug
+ln -s ../../Libraries/GRKit/Build/Debug/GRKit
+
+This setup can be seen in action at: 
+  https://github.com/primalmotion/Archipel/tree/master/ArchipelClient
 
