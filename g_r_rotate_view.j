@@ -24,7 +24,8 @@
 */
 @implementation GRRotateView : CPView
 {
-  CALayer m_rootLayer;
+  CALayer m_rootLayer; /* can be accessed via [self layer] */
+  float   m_rotationRadians @accessors(property=rotation);
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -36,6 +37,7 @@
     [self setWantsLayer:YES];
     [self setLayer:m_rootLayer];
     [self setClipsToBounds:NO];
+    [self setRotation:0.0];
   }
   return self;
 }
@@ -63,7 +65,9 @@
 */
 - (void)setRotation:(float)aRadianValue
 {
-  [m_rootLayer setAffineTransform:CGAffineTransformMakeRotation(aRadianValue)];
+  if ( m_rotationRadians == aRadianValue ) return;
+  m_rotationRadians = aRadianValue;
+  [m_rootLayer setAffineTransform:CGAffineTransformMakeRotation(m_rotationRadians)];
 }
 
 /*!
