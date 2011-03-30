@@ -26,6 +26,7 @@
 {
   CALayer m_rootLayer; /* can be accessed via [self layer] */
   float   m_rotationRadians @accessors(property=rotation);
+  SEL     m_rotSelector;
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -38,12 +39,14 @@
     [self setLayer:m_rootLayer];
     [self setClipsToBounds:NO];
     [self setRotation:0.0];
+    m_rotSelector = @selector(_hitTestSuper:);
   }
   return self;
 }
 
 /*!
-  Yes we want to have hitTests.
+  Yes we want to have hitTests but somtimes these are passed up to our super. This
+  happens if the view has not been rotated.
 */
 - (BOOL)hitTests
 {
@@ -52,12 +55,29 @@
 
 /*!
   Our hit-test is be delegated off to our layer. This has been rotated (potentially)
-  and can tell use whether we should handle any event.
+  and can tell use whether we should handle any event. It's delegated to our super
+  vie if the view has not been rotated.
 */
 - (CPView)hitTest:(CPPoint)aPoint
 {
+  return [self performSelector:m_rotSelector withObject:aPoint];
+}
+
+/*!
+  @ignore
+*/
+- (CPView)_hitTestSuper:(CPPoint)aPoint
+{
+  return [super hitTest:aPoint];
+}
+
+/*!
+  @ignore
+*/
+- (CPView)_hitTestLayer:(CPPoint)aPoint
+{
   return ( [m_rootLayer hitTest:[[self superview] 
-                                  convertPoint:aPoint toView:self]] ? self : nil );
+                                    convertPoint:aPoint toView:self]] ? self : nil );
 }
 
 /*!
@@ -67,12 +87,18 @@
 {
   if ( m_rotationRadians == aRadianValue ) return;
   m_rotationRadians = aRadianValue;
+
+  m_rotSelector = (m_rotationRadians > 0 ? @selector(_hitTestLayer:) :
+                   @selector(_hitTestSuper:));
   [m_rootLayer setAffineTransform:CGAffineTransformMakeRotation(m_rotationRadians)];
 }
 
 /*!
   Default is to draw nothing since this is intended to be used as tracking view: we
   ensure that events are handled by this view because the mouse is in the rotated
+  } else {
+    return [super hitTest:aPoint];
+  }
   view.
 */
 - (void)drawLayer:(CALayer)aLayer inContext:(CGContext)context
