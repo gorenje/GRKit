@@ -26,7 +26,7 @@
 {
   CALayer m_rootLayer; /* can be accessed via [self layer] */
   float   m_rotationRadians @accessors(property=rotation);
-  SEL     m_rotSelector;
+  int     m_vertical_flip @accessors(property=verticalFlip);
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -39,15 +39,11 @@
     [self setLayer:m_rootLayer];
     [self setClipsToBounds:NO];
     [self setRotation:0.0];
-    m_rotSelector = @selector(_hitTestSuper:);
+    [self setVerticalFlip:0];
   }
   return self;
 }
 
-/*!
-  Yes we want to have hitTests but somtimes these are passed up to our super. This
-  happens if the view has not been rotated.
-*/
 - (BOOL)hitTests
 {
   return YES;
@@ -55,26 +51,9 @@
 
 /*!
   Our hit-test is be delegated off to our layer. This has been rotated (potentially)
-  and can tell use whether we should handle any event. It's delegated to our super
-  vie if the view has not been rotated.
+  and can tell use whether we should handle any event.
 */
 - (CPView)hitTest:(CPPoint)aPoint
-{
-  return [self performSelector:m_rotSelector withObject:aPoint];
-}
-
-/*!
-  @ignore
-*/
-- (CPView)_hitTestSuper:(CPPoint)aPoint
-{
-  return [super hitTest:aPoint];
-}
-
-/*!
-  @ignore
-*/
-- (CPView)_hitTestLayer:(CPPoint)aPoint
 {
   return ( [m_rootLayer hitTest:[[self superview] 
                                     convertPoint:aPoint toView:self]] ? self : nil );
@@ -87,10 +66,23 @@
 {
   if ( m_rotationRadians == aRadianValue ) return;
   m_rotationRadians = aRadianValue;
+  [m_rootLayer setAffineTransform:[self createAffineTransform]];
+}
 
-  m_rotSelector = (m_rotationRadians > 0 ? @selector(_hitTestLayer:) :
-                   @selector(_hitTestSuper:));
-  [m_rootLayer setAffineTransform:CGAffineTransformMakeRotation(m_rotationRadians)];
+- (void)setVerticalFlip:(int)aFlipValue
+{
+  if ( m_vertical_flip == aFlipValue ) return;
+  m_vertical_flip = aFlipValue > 0 ? -1 : 0;
+  [m_rootLayer setAffineTransform:[self createAffineTransform]];
+}
+
+- (CGAffineTransform)createAffineTransform
+{
+  if ( m_vertical_flip < 0 ) {
+    return CGAffineTransformScale(CGAffineTransformMakeRotation(m_rotationRadians),-1,1);
+  } else {
+    return CGAffineTransformMakeRotation(m_rotationRadians);
+  }
 }
 
 /*!
