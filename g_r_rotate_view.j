@@ -27,6 +27,9 @@
   CALayer m_rootLayer; /* can be accessed via [self layer] */
   float   m_rotationRadians @accessors(property=rotation);
   int     m_vertical_flip @accessors(property=verticalFlip);
+
+  // Selector used for doing the hit testing.
+  SEL m_hitTest;
 }
 
 - (id)initWithFrame:(CGRect)aFrame
@@ -40,8 +43,26 @@
     [self setClipsToBounds:NO];
     [self setRotation:0.0];
     [self setVerticalFlip:0];
+    [self hitTestLayer];
   }
   return self;
+}
+
+/*!
+  When doing a hitTest, check the rotated layer (default).
+*/
+- (void)hitTestLayer
+{
+  m_hitTest = @selector(_hitTestLayer:);
+}
+
+/*!
+  Delegate the hitTest call to the super view. This can be used if you
+  know you're not going to rotate this view and he rotation does not matter.
+*/
+- (void)hitTestSuper
+{
+  m_hitTest = @selector(_hitTestSuper:);
 }
 
 - (BOOL)hitTests
@@ -55,8 +76,7 @@
 */
 - (CPView)hitTest:(CPPoint)aPoint
 {
-  return ( [m_rootLayer hitTest:[[self superview] 
-                                    convertPoint:aPoint toView:self]] ? self : nil );
+  return [self performSelector:m_hitTest withObject:aPoint];
 }
 
 /*!
@@ -96,5 +116,24 @@
 - (void)drawLayer:(CALayer)aLayer inContext:(CGContext)context
 {
 }
+
+
+/*!
+  @ignore
+*/
+- (CPView)_hitTestSuper:(CPPoint)aPoint
+{
+  return [super hitTest:aPoint];
+}
+
+/*!
+  @ignore
+*/
+- (CPView)_hitTestLayer:(CPPoint)aPoint
+{
+   return ( [m_rootLayer hitTest:[[self superview] 
+                                   convertPoint:aPoint toView:self]] ? self : nil );
+}
+ 
 
 @end
