@@ -49,6 +49,14 @@
 }
 
 /*!
+  Redraw this view.
+*/
+- (void)redisplay
+{
+  [m_rootLayer setNeedsDisplay];
+}
+
+/*!
   When doing a hitTest, check the rotated layer (default).
 */
 - (void)hitTestLayer
