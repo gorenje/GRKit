@@ -19,3 +19,4 @@
 @import "g_r_class_mixin.j"
 @import "g_r_rotate_view.j"
 @import "g_r_info_window.j"
+@import "g_r_geometry.j"
