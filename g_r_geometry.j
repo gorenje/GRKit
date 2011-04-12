@@ -505,7 +505,56 @@ GRPointSortByAngle = function(pt1, pt2) {
 @end
 
 // ---------------------------------------------------------------------------------------
-// Finally some helpers for all shapes. Defined here because before this point, not
+// GRTriangle
+@implementation GRTriangle : GRShape
+{
+  CPArray m_points @accessors(property=points,readonly);
+}
+
++ (id) triangleWithPoints:(CPArray)points
+{
+  return [[GRTriangle alloc] initWithPoints:points];
+}
+
+- (id) initWithPoints:(CPArray)points
+{
+  self = [super init];
+  if ( self ) {
+    m_points = [ [points[0] clone], [points[1] clone], [points[2] clone] ];
+  }
+  return self;
+}
+
+- (void)draw:(CGContext)aContext
+{
+  [self startPath:aContext];
+  CGPathMoveToPoint(m_path, nil, [[self points][0] x], [[self points][0] y]);
+  CGPathAddLineToPoint(m_path, nil, [[self points][1] x], [[self points][1] y]);
+  CGPathAddLineToPoint(m_path, nil, [[self points][2] x], [[self points][2] y]);
+  [self closeCurrentPath];
+}
+
+- (BOOL)is_triangle:(id)obj
+{
+  return [obj isKindOfClass:GRTriangle];
+}
+
+- (BOOL)equals:(id)obj
+{
+  return [self is_triangle:obj] && [GRTriangle pointArraysEqual:[self points] 
+                                                       andArray:[obj points]];
+}
+
+- (GRRect)clone
+{
+  return [GRTriangle triangleWithPoints:[self points]];
+}
+
+
+@end
+
+// ---------------------------------------------------------------------------------------
+// Some helpers for all shapes. Defined here because before this point, not
 // everything is defined that is required for these helpers.
 @implementation GRShape (CompareArraysOfPoints)
 
@@ -529,3 +578,29 @@ GRPointSortByAngle = function(pt1, pt2) {
 }
 
 @end
+
+
+// ---------------------------------------------------------------------------------------
+// Linked Circles, i.e. these are circles which link to the previous and next circle.
+@implementation GRLinkedCircle : GRCircle
+{
+  GRCircle m_prev_circle @accessors(property=prevCircle);
+  GRCircle m_next_circle @accessors(property=nextCircle);
+}
+
++ (id) circleWithCenter:(GRPoint)cpt radius:(float)aRadiusValue
+{
+  return [[GRLinkedCircle alloc] initWithCenter:cpt radius:aRadiusValue];
+}
+
++ (id) circleWithCenter:(GRPoint)cpt 
+                 radius:(float)aRadiusValue 
+             prevCircle:(GRCircle)aPrevCircle
+{
+  var tmp = [[GRLinkedCircle alloc] initWithCenter:cpt radius:aRadiusValue];
+  [tmp setPrevCircle:aPrevCircle];
+  return tmp;
+}
+
+@end
+
