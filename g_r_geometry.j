@@ -550,6 +550,59 @@ GRPointSortByAngle = function(pt1, pt2) {
   return [GRTriangle triangleWithPoints:[self points]];
 }
 
+@end
+
+// ---------------------------------------------------------------------------------------
+// GRBezier
+@implementation GRBezier : GRShape
+{
+  GRPoint m_start;
+  GRPoint m_ctrl_pt_1;
+  GRPoint m_ctrl_pt_2;
+  GRPoint m_end;
+}
+
++ (id) bezierWithPoints:(CPArray)points
+{
+  return [[GRBezier alloc] initWithPoints:points];
+}
+
+- (id) initWithPoints:(CPArray)points
+{
+  self = [super init];
+  if ( self ) {
+    m_start     = [points[0] clone];
+    m_ctrl_pt_1 = [points[1] clone];
+    m_ctrl_pt_2 = [points[2] clone];
+    m_end       = [points[3] clone];
+  }
+  return self;
+}
+
+- (CPArray)points
+{
+  return [ m_start, m_ctrl_pt_1, m_ctrl_pt_2, m_end ];
+}
+
+- (BOOL)equals:(id)obj
+{
+  return [obj isKindOfClass:GRBezier] && [GRBezier pointArraysEqual:[self points]
+                                                           andArray:[obj points]];
+}
+
+- (void)draw:(CGContext)aContext
+{
+  [self startPath:aContext];
+  CGPathMoveToPoint(m_path, nil, [m_start x], [m_start y]);
+  CGPathAddCurveToPoint(m_path, nil, [m_ctrl_pt_1 x], [m_ctrl_pt_1 y],
+                        [m_ctrl_pt_2 x], [m_ctrl_pt_2 y], [m_end x], [m_end y]);
+  [self closeCurrentPath];
+}
+
+- (GRBezier)clone
+{
+  return [GRBezier bezierWithPoints:[self points]];
+}
 
 @end
 
@@ -578,7 +631,6 @@ GRPointSortByAngle = function(pt1, pt2) {
 }
 
 @end
-
 
 // ---------------------------------------------------------------------------------------
 // Linked Circles, i.e. these are circles which link to the previous and next circle.
