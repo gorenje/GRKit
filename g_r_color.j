@@ -16,6 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+  Need to import the Gradient stuff to ensure that CGGradientCreateWithColorComponents
+  gets included after press and flatten. Note that the 'CoreGraphics' sub-directory gets
+  removed from the path.
+*/
+@import <AppKit/CGGradient.j>
+
 /*!
   Subclass CPColor and add basic gradient support.
 */
