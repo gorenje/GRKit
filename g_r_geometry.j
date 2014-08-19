@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -188,7 +188,7 @@
   }
   return array_of_points[ret_idx];
 }
-  
+
 @end
 
 //
@@ -225,6 +225,12 @@ GRPointSortByAngle = function(pt1, pt2) {
   float   m_c        @accessors(property=c,readonly);
   float   m_slope    @accessors(property=slope,readonly);
   float   m_yinsect  @accessors(property=yinsect,readonly);
+}
+
++ (id)lineWithRatio:(float)ratio point:(GRPoint)pt1 andPoint:(GRPoint)pt2
+{
+  var pt3 = [pt1 point_on_segment:pt2 ratio:ratio];
+  return [[GRLine alloc] initWithPoint:pt1 andPoint:pt3];
 }
 
 + (id)lineWithPoint:(GRPoint)pt1 andPoint:(GRPoint)pt2
@@ -307,7 +313,7 @@ GRPointSortByAngle = function(pt1, pt2) {
 
 - (BOOL)equals:(id)obj
 {
-  return [self is_line:obj] && ( [self points_equals:[obj points]] || 
+  return [self is_line:obj] && ( [self points_equals:[obj points]] ||
                                  [self points_equals:[[obj points][1], [obj points][0]]] );
 }
 
@@ -318,10 +324,10 @@ GRPointSortByAngle = function(pt1, pt2) {
 
 - (GRLine)clone
 {
-  return [GRLine lineWithPoint:[[self points][0] clone] 
+  return [GRLine lineWithPoint:[[self points][0] clone]
                       andPoint:[[self points][1] clone]];
 }
-  
+
 - (void)draw:(CGContext)aContext
 {
   [self startPath:aContext];
@@ -363,7 +369,7 @@ GRPointSortByAngle = function(pt1, pt2) {
   // the circle, so we move to the perimeter of the circle, exactly at start_angle.
   var move_to_perimeter = [self points:2][1];
   CGPathMoveToPoint(m_path, nil, [move_to_perimeter x], [move_to_perimeter y]);
-  CGPathAddArc(m_path, nil, [[self cpt] x], [[self cpt] y], [self radius], 
+  CGPathAddArc(m_path, nil, [[self cpt] x], [[self cpt] y], [self radius],
                0, 2 * Math.PI, YES);
   [self closeCurrentPath];
 }
@@ -418,7 +424,7 @@ GRPointSortByAngle = function(pt1, pt2) {
   if ( [self equals:other_circle] ) { return []; }
   // one circle is contained in the other - no intersection points
   if ( distance < Math.abs(r0 - r1)) { return []; }
-    
+
   var a = ((r0*r0) - (r1*r1) + (distance * distance)) / (2 * distance);
   var h = Math.sqrt((r0*r0) - (a*a));
 
@@ -426,7 +432,7 @@ GRPointSortByAngle = function(pt1, pt2) {
   var dx = [tpt x];
   var dy = [tpt y];
 
-  var twoPt = [GRPoint pointWithX:[[self cpt] x] + (dx*a/distance) 
+  var twoPt = [GRPoint pointWithX:[[self cpt] x] + (dx*a/distance)
                                 Y:[[self cpt] y] + (dy*a/distance)];
   var rPt = [GRPoint pointWithX:-dy * (h/distance) Y:dx * (h/distance)];
   return [ [twoPt plus:rPt], [twoPt minus:rPt] ];
@@ -446,7 +452,7 @@ GRPointSortByAngle = function(pt1, pt2) {
 + (CPArray)makeSquareFromPoint:(GRPoint)pt1 andPoint:(GRPoint)pt2
 {
   var d = [pt1 distance:pt2], radius = Math.sqrt((d*d)/2);
-  return [[GRCircle circleWithCenter:pt1 radius:radius] 
+  return [[GRCircle circleWithCenter:pt1 radius:radius]
            intersection:[GRCircle circleWithCenter:pt2 radius:radius]];
 }
 
@@ -493,7 +499,7 @@ GRPointSortByAngle = function(pt1, pt2) {
 
 - (BOOL)equals:(id)obj
 {
-  return [self is_rectangle:obj] && [GRRect pointArraysEqual:[self points] 
+  return [self is_rectangle:obj] && [GRRect pointArraysEqual:[self points]
                                                     andArray:[obj points]];
 }
 
@@ -541,7 +547,7 @@ GRPointSortByAngle = function(pt1, pt2) {
 
 - (BOOL)equals:(id)obj
 {
-  return [self is_triangle:obj] && [GRTriangle pointArraysEqual:[self points] 
+  return [self is_triangle:obj] && [GRTriangle pointArraysEqual:[self points]
                                                        andArray:[obj points]];
 }
 
@@ -623,7 +629,7 @@ GRPointSortByAngle = function(pt1, pt2) {
 + (BOOL)pointArraysEqual:(CPArray)ary1 andArray:(CPArray)ary2
 {
   if ( [ary1 count] != [ary2 count] ) { return NO; }
-  var cary1 = [GRShape createCopyAndSort:ary1], 
+  var cary1 = [GRShape createCopyAndSort:ary1],
     cary2 = [GRShape createCopyAndSort:ary2],
     idx = [cary2 count];
   while ( idx-- ) { if ( ![cary1[idx] equals:cary2[idx]] ) { return NO; } }
@@ -645,8 +651,8 @@ GRPointSortByAngle = function(pt1, pt2) {
   return [[GRLinkedCircle alloc] initWithCenter:cpt radius:aRadiusValue];
 }
 
-+ (id) circleWithCenter:(GRPoint)cpt 
-                 radius:(float)aRadiusValue 
++ (id) circleWithCenter:(GRPoint)cpt
+                 radius:(float)aRadiusValue
              prevCircle:(GRCircle)aPrevCircle
 {
   var tmp = [[GRLinkedCircle alloc] initWithCenter:cpt radius:aRadiusValue];
