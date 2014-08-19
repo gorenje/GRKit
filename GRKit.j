@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -21,3 +21,7 @@
 @import "g_r_info_window.j"
 @import "g_r_geometry.j"
 @import "g_r_color.j"
+
+// Only import if LPKit has been included in your project. Else POST and PUT actions
+// won't work.
+// @import "g_r_comm_worker.j"
